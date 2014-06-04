@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>JavaScript Get Json</title>
+  <script type="text/javascript" src="json-decode.js"></script>
+  <script type="text/javascript">
+	document.addEventListener('DOMContentLoaded', function() {
+		JsonInfo.initialize();
+		// ASync
+		/*
+		JsonInfo._dataReceivedCallback = function() { 
+			// Info retrieved do something
+			alert("All data received!");
+			JsonInfo.printHtml("results");
+		};
+		JsonInfo.fetchInfoAsync("arduino1",1,"joao.guiomar","ola");
+		*/
+		// JsonInfo.fetchInfoSync("arduino1",1,"joao.guiomar","ola");
+		// JsonInfo.printHtml("results");
+		getHealthSync();
+	}, false);	  
+  </script>
+</head>
+<body>
+<h1>My Home Page</h1>
+<div id="results"></div>
+</body>
+</html>
