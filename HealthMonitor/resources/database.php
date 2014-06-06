@@ -1,7 +1,4 @@
 <?php
-/** 
- *	}
- */
 require_once("resources/functions.php");
 
 class Database {
@@ -97,12 +94,9 @@ class Database {
 					mysqli_stmt_bind_param($stmt, "d", $bedNumber);
 				}
 				mysqli_stmt_execute($stmt);
-// 				$res = mysqli_stmt_get_result($stmt);
 				mysqli_stmt_bind_result($stmt,$id,$dateTime,$param1,$val1,$deviceId,$idPatients,$name,$age,$gender,$bedNumber,$userName,$password);
 				$return = array();
-// 				while ($row = mysqli_fetch_assoc($res)) {
 				while(mysqli_stmt_fetch($stmt)) {
-// 					$return[] = $row;
 					$return[] = array('Id'=>$id,'dateTime'=>$dateTime,'param1'=>$param1,'val1'=>$val1,'deviceId'=>$deviceId,'idPatients'=>$idPatients,'name'=>$name,'age'=>$age,'gender'=>$gender,'bedNumber'=>$bedNumber,'userName'=>$userName,'password'=>$password);
 				}
 
@@ -153,12 +147,9 @@ class Database {
 					mysqli_stmt_bind_param($stmt, "d", $bedNumber);
 				}
 				mysqli_stmt_execute($stmt);
-				// 				$res = mysqli_stmt_get_result($stmt);
 				mysqli_stmt_bind_result($stmt,$id,$dateTime,$param1,$val1,$deviceId,$idPatients,$name,$age,$gender,$bedNumber,$userName,$password);
 				$return = array();
-				// 				while ($row = mysqli_fetch_assoc($res)) {
 				while(mysqli_stmt_fetch($stmt)) {
-					// 					$return[] = $row;
 					$return[] = array('Id'=>$id,'dateTime'=>$dateTime,'param1'=>$param1,'val1'=>$val1,'deviceId'=>$deviceId,'idPatients'=>$idPatients,'name'=>$name,'age'=>$age,'gender'=>$gender,'bedNumber'=>$bedNumber,'userName'=>$userName,'password'=>$password);
 				}
 	
@@ -185,6 +176,59 @@ class Database {
 		}
 	}
 	
+	function listCoordinators($deviceId=NULL) {
+		$where = NULL;
+		if($deviceId!=NULL) {
+			$where = "deviceId = ?";
+		}
+		$query = "SELECT * FROM `tblCoordinators` ".($where!=NULL?"WHERE $where":'');
+		try {
+			if($stmt = mysqli_prepare($this->link,$query)) {
+				if($deviceId!=NULL) {
+					mysqli_stmt_bind_param($stmt, "s", $deviceId);
+				}
+				mysqli_stmt_execute($stmt);
+				mysqli_stmt_bind_result($stmt,$deviceId,$registerTimestamp,$poolingTime,$status);
+				$return = array();
+				while(mysqli_stmt_fetch($stmt)) {
+					$return[] = array('deviceId'=>$deviceId,'registerTimestamp'=>$registerTimestamp,'poolingTime' => $poolingTime,'status'=>$status);
+				}
+				mysqli_stmt_close($stmt);
+				return $return;
+			}
+		} catch(Exception $ex) {
+			throw new Exception($ex->getMessage());
+		}
+	}
+	
+	function registerCoordinator($deviceId,$poolingTime) {
+		$query = "INSERT INTO `tblCoordinators` (`deviceId`,`poolingTime`) VALUES (?, ?)";
+		try {
+			if ($stmt = mysqli_prepare($this->link,$query)) {
+				mysqli_stmt_bind_param($stmt, "sd", $deviceId,$poolingTime);
+				$res = mysqli_stmt_execute($stmt);
+				mysqli_stmt_close($stmt);
+				return $res;
+			}
+		} catch(Exception $ex) {
+			throw new Exception($ex->getMessage());
+		}
+	}
+	
+	function deleteCoordinator($deviceId) {
+		$query = "DELETE FROM `tblCoordinators` WHERE deviceId=?";
+		try {
+			if ($stmt = mysqli_prepare($this->link,$query)) {
+				mysqli_stmt_bind_param($stmt, "s", $deviceId);
+				$res = mysqli_stmt_execute($stmt);
+				mysqli_stmt_close($stmt);
+				return $res;
+			}
+		} catch(Exception $ex) {
+			throw new Exception($ex->getMessage());
+		}
+	}
+	
 	function listBoards($deviceId=NULL) {
 		$where = NULL;
 		if($deviceId!=NULL) {
@@ -197,13 +241,10 @@ class Database {
 					mysqli_stmt_bind_param($stmt, "s", $deviceId);
 				}
 				mysqli_stmt_execute($stmt);
-// 				$res = mysqli_stmt_get_result($stmt);
-				mysqli_stmt_bind_result($stmt,$deviceId,$registerTimestamp);
+				mysqli_stmt_bind_result($stmt,$deviceId,$registerTimestamp,$status,$coordinatorDeviceId);
 				$return = array();
-// 				while ($row = mysqli_fetch_assoc($res)) {
 				while(mysqli_stmt_fetch($stmt)) {
-// 					$return[] = $row;
-					$return[] = array('deviceId'=>$deviceId,'registerTimestamp'=>$registerTimestamp);
+					$return[] = array('deviceId'=>$deviceId,'registerTimestamp'=>$registerTimestamp,'status'=>$status,'Coordinators_deviceId'=>$coordinatorDeviceId);
 				}
 				mysqli_stmt_close($stmt);
 				return $return;
@@ -219,12 +260,9 @@ class Database {
 			if($stmt = mysqli_prepare($this->link,$query)) {
 				mysqli_stmt_bind_param($stmt, "d", $idUsers);
 				mysqli_stmt_execute($stmt);
-// 				$res = mysqli_stmt_get_result($stmt);
-				mysqli_stmt_bind_result($stmt,$deviceId,$idUsers,$userName,$password,$localServer,$status,$registerTimestamp);
+				mysqli_stmt_bind_result($stmt,$deviceId,$boardStatus,$idUsers,$userName,$password,$userStatus,$registerTimestamp);
 				$return = array();
-// 				while ($row = mysqli_fetch_assoc($res)) {
 				while(mysqli_stmt_fetch($stmt)) {
-// 					$return[] = $row;
 					$return[] = array('deviceId'=>$deviceId);
 				}
 				mysqli_stmt_close($stmt);
@@ -236,16 +274,13 @@ class Database {
 	}
 	
 	function listUnassociatedUsersBoards() {
-		$query = "SELECT * FROM `viewBoardsByUsers` WHERE idUsers IS NULL";
+		$query = "SELECT * FROM `viewBoardsByUsers` WHERE idUsers IS NULL AND boardStatus!='0'";
 		try {
 			if($stmt = mysqli_prepare($this->link,$query)) {
 				mysqli_stmt_execute($stmt);
-// 				$res = mysqli_stmt_get_result($stmt);
-				mysqli_stmt_bind_result($stmt,$deviceId,$idUsers,$userName,$password,$localServer,$status,$registerTimestamp);
+				mysqli_stmt_bind_result($stmt,$deviceId,$boardStatus,$idUsers,$userName,$password,$status,$registerTimestamp);
 				$return = array();
-// 				while ($row = mysqli_fetch_assoc($res)) {
 				while(mysqli_stmt_fetch($stmt)) {
-// 					$return[] = $row;
 					$return[] = array('deviceId'=>$deviceId);
 				}	
 				mysqli_stmt_close($stmt);
@@ -257,31 +292,28 @@ class Database {
 	}
 	
 	function listUnassociatedPatientsBoards() {
-		$query = "SELECT * FROM `viewBoardsByPatients` WHERE idPatients IS NULL";
+		$query = "SELECT * FROM `viewBoardsByPatients` WHERE idPatients IS NULL AND status!='0'";
 		try {
+			$return = array();
 			if($stmt = mysqli_prepare($this->link,$query)) {
 				mysqli_stmt_execute($stmt);
-				// $res = mysqli_stmt_get_result($stmt);
-				mysqli_stmt_bind_result($stmt,$deviceId,$idPatients,$name,$age,$gender,$bedNumber);
-				$return = array();
-// 				while ($row = mysqli_fetch_assoc($res)) {
+				mysqli_stmt_bind_result($stmt,$deviceId,$boardStatus,$idPatients,$name,$age,$gender,$bedNumber);
 				while(mysqli_stmt_fetch($stmt)) {
-// 					$return[] = $row;
-					$return[] = array('deviceId'=>$deviceId,'idPatients'=>$idPatients,'name'=>$name,'age'=>$age,'gender'=>$gender,'bedNumber'=>$bedNumber);
+					$return[] = array('deviceId'=>$deviceId);
 				}
 				mysqli_stmt_close($stmt);
-				return $return;
 			}
+			return $return;
 		} catch(Exception $ex) {
 			throw new Exception($ex->getMessage());
 		}
 	}
 	
-	function registerBoard($deviceId) {
-		$query = "INSERT INTO `tblBoards` (`deviceId`) VALUES (?)";
+	function registerBoard($deviceId,$coordinatorDeviceId) {
+		$query = "INSERT INTO `tblBoards` (`deviceId`,`Coordinators_deviceId`) VALUES (?, ?)";
 		try {
 			if ($stmt = mysqli_prepare($this->link,$query)) {
-				mysqli_stmt_bind_param($stmt, "s", $deviceId);
+				mysqli_stmt_bind_param($stmt, "ss", $deviceId,$coordinatorDeviceId);
 				$res = mysqli_stmt_execute($stmt);
 				mysqli_stmt_close($stmt);
 				return $res;
@@ -295,7 +327,7 @@ class Database {
 		$query = "DELETE FROM `tblBoards` WHERE deviceId=?";
 		try {
 			if ($stmt = mysqli_prepare($this->link,$query)) {
-				mysqli_stmt_bind_param($stmt, "d", $deviceId);
+				mysqli_stmt_bind_param($stmt, "s", $deviceId);
 				$res = mysqli_stmt_execute($stmt);
 				mysqli_stmt_close($stmt);
 				return $res;
@@ -317,13 +349,10 @@ class Database {
 					mysqli_stmt_bind_param($stmt, "d", $idUsers);
 				}
 				mysqli_stmt_execute($stmt);
-// 				$res = mysqli_stmt_get_result($stmt);
-				mysqli_stmt_bind_result($stmt,$idUsers,$userName,$password,$localServer,$status,$registerTimestamp);
+				mysqli_stmt_bind_result($stmt,$idUsers,$registerTimestamp,$userName,$password,$status);
 				$return = array();
-// 				while ($row = mysqli_fetch_assoc($res)) {
 				while(mysqli_stmt_fetch($stmt)) {
-// 					$return[] = $row;
-					$return[] = array('idUsers'=>$idUsers,'userName'=>$userName,'password'=>$password,'localServer'=>$localServer,'status'=>$status,'registerTimestamp'=>$registerTimestamp);
+					$return[] = array('idUsers'=>$idUsers,'registerTimestamp'=>$registerTimestamp,'userName'=>$userName,'password'=>$password,'status'=>$status);
 				}
 				mysqli_stmt_close($stmt);
 				return $return;
@@ -383,13 +412,10 @@ class Database {
 					mysqli_stmt_bind_param($stmt, "s", $password);
 				}
 				mysqli_stmt_execute($stmt);
-// 				$res = mysqli_stmt_get_result($stmt);
-				mysqli_stmt_bind_result($stmt,$idUsers,$userName,$password,$localServer,$status,$registerTimestamp);
+				mysqli_stmt_bind_result($stmt,$idUsers,$registerTimestamp,$userName,$password,$status);
 				$return = array();
-// 				while ($row = mysqli_fetch_assoc($res)) {
 				while(mysqli_stmt_fetch($stmt)) {
-// 					$return[] = $row;
-					$return[] = array('idUsers'=>$idUsers,'userName'=>$userName,'password'=>$password,'localServer'=>$localServer,'status'=>$status,'registerTimestamp'=>$registerTimestamp);
+					$return[] = array('idUsers'=>$idUsers,'registerTimestamp'=>$registerTimestamp,'userName'=>$userName,'password'=>$password,'status'=>$status);
 				}
 				mysqli_stmt_close($stmt);
 				return $return;
@@ -420,7 +446,6 @@ class Database {
 					mysqli_stmt_bind_param($stmt, "s", $deviceId);
 				}
 				mysqli_stmt_execute($stmt);
-// 				$res = mysqli_stmt_get_result($stmt);
 				mysqli_stmt_store_result($stmt);
 				return (mysqli_stmt_num_rows($stmt)>0?true:false);
 			}
@@ -527,7 +552,6 @@ class Database {
 					mysqli_stmt_bind_param($stmt, "s", $password);
 				}
 				mysqli_stmt_execute($stmt);
-// 				$res = mysqli_stmt_get_result($stmt);
 				mysqli_stmt_store_result($stmt);
 				return (mysqli_stmt_num_rows($stmt)>0?true:false);
 			}
@@ -548,12 +572,9 @@ class Database {
 					mysqli_stmt_bind_param($stmt,"d",$idMedications);
 				}
 				mysqli_stmt_execute($stmt);
-// 				$res = mysqli_stmt_get_result($stmt);
 				mysqli_stmt_bind_result($stmt,$idMedications,$drug,$dosage,$units);
 				$return = array();
-// 				while ($row = mysqli_fetch_assoc($res)) {
 				while(mysqli_stmt_fetch($stmt)) {
-// 					$return[] = $row;
 					$return[] = array('idMedications'=>$idMedications,'drug'=>$drug,'dosage'=>$dosage,'units'=>$units);
 				}
 				mysqli_stmt_close($stmt);

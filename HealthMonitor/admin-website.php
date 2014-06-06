@@ -18,9 +18,6 @@ try {
 	return 0;
 }
 
-// if(!current_user_can('admin'))
-// 	die('You do not have sufficient permissions to access page.');
-
 printInfo(__FILE__,"Loading Page...");
 
 /** CONSTANTS **/
@@ -36,11 +33,11 @@ if(isset($_REQUEST['settings'])) {
 	$settings = $_POST['settings'];
 }
 $tabs = array(
-	'boards' 	=> array('label' => 'Boards',   'url' => $currentPageUrl[0].'?settings=boards'	 ),
-	'users'  	=> array('label' => 'Users',    'url' => $currentPageUrl[0].'?settings=users'	 ),
-	'pharmacy'  => array('label' => 'Pharmacy', 'url' => $currentPageUrl[0].'?settings=pharmacy' ),
-	'patients'  => array('label' => 'Patients', 'url' => $currentPageUrl[0].'?settings=patients' ),
-	'tests'  	=> array('label' => 'Tests',    'url' => $currentPageUrl[0].'?settings=tests'	 ));
+	'boards' 		=> array('label' => 'Boards',   	'url' => $currentPageUrl[0].'?settings=boards'	 	),
+	'users'  		=> array('label' => 'Users',    	'url' => $currentPageUrl[0].'?settings=users'	 	),
+	'pharmacy'  	=> array('label' => 'Pharmacy', 	'url' => $currentPageUrl[0].'?settings=pharmacy' 	),
+	'patients'  	=> array('label' => 'Patients', 	'url' => $currentPageUrl[0].'?settings=patients' 	),
+	'tests'  		=> array('label' => 'Tests',    	'url' => $currentPageUrl[0].'?settings=tests'	 	));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -79,6 +76,7 @@ $tabs = array(
 			break;
 		case 'boards':
 		default:
+			require_once('admin-coordinators.php');
 			require_once('admin-boards.php');
 			break;
 	}

@@ -1,7 +1,4 @@
 <?php
-// if (!current_user_can('admin_patients'))
-//  	die('You do not have sufficient permissions to access this page.');
-	
 	$currentPageUrl = explode('?',Page::currentPageURL());
 	
 	class PatientsPage extends Page {
@@ -67,7 +64,7 @@
 							$errors[] = printError(__FILE__,'Error uploading photos: ' . $_FILES["photo"]["error"]);
 						} else {
 							if(file_exists("uploaded/" . $_FILES["photo"]["name"])) {
-								$errors[] = printError(__FILE__,'File already exists.');
+								$errors[] = printError(__FILE__,'Photo already exists.');
 							} else {
 								if(move_uploaded_file($_FILES["photo"]["tmp_name"],"uploaded/" . $_FILES["photo"]["name"])) {
 									$photo = $_FILES["photo"]["name"];
@@ -75,7 +72,7 @@
 							}
 						}
 					} else {
-						$errors[] = printError(__FILE__,'Empty or invalid file format.');
+						$errors[] = printError(__FILE__,'Empty or invalid photo format.');
 					}
 					try {
 						$db = new Database(HOST,DB,USER,PASS);

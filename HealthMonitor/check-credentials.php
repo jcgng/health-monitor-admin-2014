@@ -11,15 +11,19 @@ if(($userName==NULL) || ($password==NULL)) {
 }
 
 $db = new Database(HOST,DB,USER,PASS);
-$user = $db->getUser($userName,$password);
-if(count($user)==0) { 
-	header("HTTP/1.1 403 Forbidden");
-    exit;
-}
-
-$deviceId = (isset($_REQUEST['board'])?$_REQUEST['board']:NULL);
-if($deviceId!=NULL)
-if(!$db->isUserBoard($user[0]['userName'],$deviceId)) { 
-	header("HTTP/1.1 403 Forbidden");
-    exit;
+// check if it is admin
+if(!$db->isAdmin($userName, $password)) {
+	$user = $db->getUser($userName,$password);
+	if(count($user)==0) { 
+		header("HTTP/1.1 403 Forbidden");
+	    exit;
+	}
+	
+	$deviceId = (isset($_REQUEST['board'])?$_REQUEST['board']:NULL);
+	if($deviceId!=NULL) {
+		if(!$db->isUserBoard($user[0]['userName'],$deviceId)) { 
+			header("HTTP/1.1 403 Forbidden");
+		    exit;
+		}
+	}
 }
