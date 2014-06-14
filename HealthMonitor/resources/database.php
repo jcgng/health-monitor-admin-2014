@@ -94,10 +94,10 @@ class Database {
 					mysqli_stmt_bind_param($stmt, "d", $bedNumber);
 				}
 				mysqli_stmt_execute($stmt);
-				mysqli_stmt_bind_result($stmt,$id,$dateTime,$param1,$val1,$deviceId,$idPatients,$name,$age,$gender,$bedNumber,$userName,$password);
+				mysqli_stmt_bind_result($stmt,$id,$dateTime,$param1,$val1,$deviceId,$idPatients,$name,$age,$gender,$bedNumber,$photo,$userName,$password);
 				$return = array();
 				while(mysqli_stmt_fetch($stmt)) {
-					$return[] = array('Id'=>$id,'dateTime'=>$dateTime,'param1'=>$param1,'val1'=>$val1,'deviceId'=>$deviceId,'idPatients'=>$idPatients,'name'=>$name,'age'=>$age,'gender'=>$gender,'bedNumber'=>$bedNumber,'userName'=>$userName,'password'=>$password);
+					$return[] = array('Id'=>$id,'dateTime'=>$dateTime,'param1'=>$param1,'val1'=>$val1,'deviceId'=>$deviceId,'idPatients'=>$idPatients,'name'=>$name,'age'=>$age,'gender'=>$gender,'bedNumber'=>$bedNumber,'photo'=>$photo,'userName'=>$userName,'password'=>$password);
 				}
 
 				mysqli_stmt_close($stmt);
@@ -123,7 +123,7 @@ class Database {
 		} else if($bedNumber!=NULL) {
 			$where .= "`bedNumber` = ?";
 		}
-		$query = "SELECT * FROM (SELECT * FROM `viewHealth` ".($orderby!=NULL?"ORDER BY $orderby":"")." $order) AS `viewHealth` ".($where!=NULL?"WHERE $where":'')." GROUP BY `param1` LIMIT $limit";
+		$query = "SELECT * FROM (SELECT * FROM `viewHealth` ".($where!=NULL?"WHERE $where":'')." ".($orderby!=NULL?"ORDER BY $orderby":"")." $order) AS `viewHealth` GROUP BY `param1` LIMIT $limit";
 		try {
 			if ($stmt = mysqli_prepare($this->link,$query)) {
 				if($deviceId!=NULL) {
@@ -147,10 +147,10 @@ class Database {
 					mysqli_stmt_bind_param($stmt, "d", $bedNumber);
 				}
 				mysqli_stmt_execute($stmt);
-				mysqli_stmt_bind_result($stmt,$id,$dateTime,$param1,$val1,$deviceId,$idPatients,$name,$age,$gender,$bedNumber,$userName,$password);
+				mysqli_stmt_bind_result($stmt,$id,$dateTime,$param1,$val1,$deviceId,$idPatients,$name,$age,$gender,$bedNumber,$photo,$userName,$password);
 				$return = array();
 				while(mysqli_stmt_fetch($stmt)) {
-					$return[] = array('Id'=>$id,'dateTime'=>$dateTime,'param1'=>$param1,'val1'=>$val1,'deviceId'=>$deviceId,'idPatients'=>$idPatients,'name'=>$name,'age'=>$age,'gender'=>$gender,'bedNumber'=>$bedNumber,'userName'=>$userName,'password'=>$password);
+					$return[] = array('Id'=>$id,'dateTime'=>$dateTime,'param1'=>$param1,'val1'=>$val1,'deviceId'=>$deviceId,'idPatients'=>$idPatients,'name'=>$name,'age'=>$age,'gender'=>$gender,'bedNumber'=>$bedNumber,'photo'=>$photo,'userName'=>$userName,'password'=>$password);
 				}
 	
 				mysqli_stmt_close($stmt);
