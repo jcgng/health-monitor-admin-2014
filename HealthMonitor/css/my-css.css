@@ -12,6 +12,11 @@ a.logout {
 	font-size:11px;
 }
 
+.icon32 {
+	width: 32px;
+	height: 32px
+}
+
 /** Forms **/
 .form-table th {
 	text-align: left;

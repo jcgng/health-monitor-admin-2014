@@ -43,7 +43,7 @@ $tabs = array(
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title></title>
+  <title><?php echo $title; ?></title>
   <!-- CSS -->
   <link rel="stylesheet" href="css/my-css.css" type="text/css" media="screen" />
   <script type="text/javascript" src="javascript/my-scripts.js"></script>
@@ -52,7 +52,7 @@ $tabs = array(
 <!-- HTML -->
 <div class="plugin-banner"></div>
 <div class="wrap">
-<!-- <img class="icon32" src="images/"/> -->
+<img class="icon32" src="images/splashscreen.png"/>
 <h2><?php echo $title; ?></h2><a href="<?php echo $currentPageUrl[0]; ?>?action=logout" class="logout" >Logout</a>
 <h3 class="nav-tab-wrapper">
 <?php
