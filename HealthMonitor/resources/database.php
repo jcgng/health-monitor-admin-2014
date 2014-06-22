@@ -565,7 +565,7 @@ class Database {
 		if($idMedications!=NULL) {
 			$where = "idMedications = ?";
 		}
-		$query = "SELECT * FROM `tblMedications` ".($where!=NULL?"WHERE $where":'');
+		$query = "SELECT * FROM `tblMedications` ".($where!=NULL?"WHERE $where":'')." ORDER BY `drug`";
 		try {
 			if($stmt = mysqli_prepare($this->link,$query)) {
 				if($idMedications!=NULL) {
@@ -628,7 +628,7 @@ class Database {
 	}
 	
 	function listPatientMedications($idPatients) {
-		$query = "SELECT * FROM `viewMedicationsByPatients` WHERE idPatients = ?";
+		$query = "SELECT * FROM `viewMedicationsByPatients` WHERE idPatients = ? ORDER BY `drug`";
 		try {
 			if($stmt = mysqli_prepare($this->link,$query)) {
 				mysqli_stmt_bind_param($stmt, "d", $idPatients);
