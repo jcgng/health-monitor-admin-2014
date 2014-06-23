@@ -477,7 +477,7 @@ class Database {
 		} else if($deviceId!=NULL) {
 			$where .= "Boards_deviceId = ?";
 		}
-		$query = "SELECT * FROM `tblPatients` ".($where!=NULL?"WHERE $where":'');
+		$query = "SELECT * FROM `tblPatients` ".($where!=NULL?"WHERE $where":'')." ORDER BY `bedNumber`";
 		try {
 			if($stmt = mysqli_prepare($this->link,$query)) {
 				if($idPatients!=NULL) {
